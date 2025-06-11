@@ -30,6 +30,19 @@
           <q-btn flat dense label="ورود" to="/login" class="q-mr-sm" icon="login" />
           <q-btn outline dense label="ثبت نام" to="/register" color="white" icon="person_add" />
         </div>
+        <!-- src/layouts/MainLayout.vue -> در q-list منوی کشویی -->
+<EssentialLink
+  title="کسب‌وکارها"
+  caption="مشاهده لیست کسب‌وکارها"
+  icon="store"
+  link="/businesses"
+/>
+<EssentialLink
+  title="محله‌ها"
+  caption="مشاهده لیست محله‌ها"
+  icon="holiday_village" 
+  link="/neighborhoods"
+/>
       </q-toolbar>
     </q-header>
 
