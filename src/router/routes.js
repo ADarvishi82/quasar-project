@@ -46,6 +46,11 @@ const routes = [
         name: 'neighborhood-detail',
         component: () => import('pages/NeighborhoodDetailPage.vue'),
         props: true // برای پاس دادن id به عنوان prop
+      },
+      {
+        path: 'feed', // یا هر نامی که برای فید می‌خواهید
+        name: 'feed',
+        component: () => import('pages/FeedPage.vue')
       }
     ]
   },
