@@ -33,11 +33,6 @@
             autocomplete="email"
           />
 
-          <!-- (اختیاری) می‌توانید فیلدهای اولیه کسب‌وکار را اینجا اضافه کنید -->
-          <!-- <q-input filled v-model="formData.business_name" label="نام کسب‌وکار/سازمان" outlined /> -->
-          <!-- <q-select filled v-model="formData.business_account_type" :options="[{label:'کسب‌وکار', value:'BUSINESS'}, {label:'سازمان', value:'ORGANIZATION'}]" label="نوع حساب کسب‌وکار" emit-value map-options outlined /> -->
-
-
           <q-input
             filled
             type="password"
@@ -82,6 +77,17 @@
         </q-form>
       </q-card-section>
 
+      <q-card-section>
+        <q-separator class="q-my-md" inset><span class="text-grey-7">یا</span></q-separator>
+        <div class="column items-center q-gutter-y-sm">
+          <!-- کامپوننت جدید برای ثبت نام با گوگل -->
+          <GoogleLogin :callback="handleGoogleLoginCallback" />
+          <div v-if="googleErrorMessage" class="text-negative q-mt-sm text-caption full-width text-center">
+            {{ googleErrorMessage }}
+          </div>
+        </div>
+      </q-card-section>
+
       <q-card-section class="text-center q-pt-none">
         <div class="text-grey-8">
           <router-link to="/register/user" class="text-primary text-weight-bold" style="text-decoration: none">
@@ -101,84 +107,68 @@
 
 <script setup>
 import { ref } from 'vue';
+import { GoogleLogin } from 'vue3-google-login';
 import { useAuthStore } from 'stores/auth-store';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import { api } from 'boot/axios';
 
-const formData = ref({
-  username: '',
-  email: '',
-  password: '',
-  password2: '',
-  // business_name: '', // (اختیاری) اگر فیلدهای اولیه کسب‌وکار را می‌گیرید
-  // business_account_type: 'BUSINESS', // (اختیاری)
-});
+const formData = ref({ username: '', email: '', password: '', password2: '' });
 const loading = ref(false);
 const errorMessage = ref('');
+const googleErrorMessage = ref('');
 
 const authStore = useAuthStore();
 const router = useRouter();
 const $q = useQuasar();
 
-function showNotification(type, message) {
-  if ($q && typeof $q.notify === 'function') {
-    $q.notify({ type, message, position: 'top', html: type === 'negative', timeout: type === 'negative' ? 7000 : 3000 });
-  } else {
-    console.warn(`Quasar Notify is not available. Type: ${type}, Message: ${message}`);
-    if (type === 'negative' || type === 'warning') {
-        errorMessage.value = message;
-    }
-  }
-}
-
 async function handleRegister() {
   errorMessage.value = '';
+  // اعتبارسنجی اولیه
   if (!formData.value.username || !formData.value.email || !formData.value.password || !formData.value.password2) {
-    showNotification('warning', 'لطفا تمام فیلدهای کاربر را پر کنید.');
-    return;
-  }
-  // (اختیاری) اعتبارسنجی برای فیلدهای اولیه کسب‌وکار اگر اضافه کرده‌اید
-  // if (formData.value.business_name === '') { ... }
-
+      $q.notify({ type: 'warning', message: 'لطفا تمام فیلدهای کاربر را پر کنید.' }); return; }
   if (formData.value.password !== formData.value.password2) {
-    showNotification('warning', 'رمزهای عبور مطابقت ندارند.');
-    return;
-  }
-   if (formData.value.password.length < 8) {
-    showNotification('warning', 'رمز عبور باید حداقل ۸ کاراکتر باشد.');
-    return;
-  }
+      $q.notify({ type: 'warning', message: 'رمزهای عبور مطابقت ندارند.' }); return; }
 
   loading.value = true;
-
   const registrationPayload = {
-    username: formData.value.username,
-    email: formData.value.email,
-    password1: formData.value.password, // ارسال به بک‌اند با نام password1
-    password2: formData.value.password2,
-    // (اختیاری) اگر می‌خواهید به بک‌اند اطلاع دهید که این ثبت‌نام کسب‌وکار است:
-    // is_business_registration: true,
-    // initial_business_name: formData.value.business_name,
-    // initial_business_account_type: formData.value.business_account_type,
+      username: formData.value.username,
+      email: formData.value.email,
+      password1: formData.value.password,
+      password2: formData.value.password2,
+      // (اختیاری) می‌توانید یک فلگ برای بک‌اند بفرستید که این ثبت‌نام تجاری است
+      // is_business_registration: true
   };
-
-  console.log("REGISTER_BUSINESS_PAGE: Sending registration data to store:", registrationPayload);
-
-  const result = await authStore.register(registrationPayload); // فعلا همان اکشن قبلی
+  const result = await authStore.register(registrationPayload);
   loading.value = false;
-
   if (result.success) {
-    console.log("REGISTER_BUSINESS_PAGE: Registration successful. Data:", result.data);
-    showNotification('positive', 'ثبت نام مدیر حساب با موفقیت انجام شد! لطفاً وارد شوید و پروفایل کسب‌وکار خود را تکمیل کنید.');
-    router.push('/login');
-    // یا می‌توانید کاربر را مستقیماً به صفحه ایجاد/ویرایش پروفایل کسب‌وکار هدایت کنید
-    // router.push('/manage-business'); // اما اول باید لاگین کند
+      $q.notify({ type: 'positive', message: 'ثبت نام مدیر حساب با موفقیت انجام شد! لطفاً وارد شوید.' });
+      router.push('/login');
   } else {
-    console.log("REGISTER_BUSINESS_PAGE: Registration failed. Message:", result.message);
-    const msg = result.message || "خطای نامشخص در ثبت نام.";
-    showNotification('negative', msg);
+      errorMessage.value = result.message || "خطای نامشخص در ثبت نام.";
+      $q.notify({ type: 'negative', message: errorMessage.value, html: true });
   }
 }
+
+// تابع callback برای لاگین با گوگل (مشابه LoginPage)
+const handleGoogleLoginCallback = async (response) => {
+  googleErrorMessage.value = '';
+  if (!response.credential) {
+    googleErrorMessage.value = 'پاسخ معتبری از گوگل دریافت نشد.';
+    return;
+  }
+  try {
+    const backendResponse = await api.post('/api/auth/google/', { id_token: response.credential });
+    const { key, user } = backendResponse.data;
+    if (!key || !user) { throw new Error('پاسخ سرور معتبر نیست.'); }
+    await authStore.setTokenAndUser({ access: key, user: user });
+    $q.notify({ type: 'positive', message: 'ورود/ثبت نام با گوگل موفقیت‌آمیز بود!' });
+    router.push('/'); // پس از ورود موفق با گوگل، به صفحه اصلی هدایت می‌شود
+  } catch (error) {
+    console.error("Google login/register error:", error);
+    googleErrorMessage.value = 'خطا در ارتباط با سرور.';
+  }
+};
 </script>
 
 <style scoped>

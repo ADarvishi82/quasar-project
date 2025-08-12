@@ -14,7 +14,8 @@ export default defineConfig((/* ctx */) => {
     boot: [
       'axios',
       'auth-loader',
-      'google-maps'
+      'google-maps',
+      'google-login-init',
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
@@ -93,7 +94,10 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Notify',
+        'Dialog'
+      ]
     },
 
     // animations: 'all', // --- includes all animations

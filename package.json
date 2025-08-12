@@ -23,6 +23,7 @@
     "quasar": "^2.16.0",
     "vue": "^3.4.18",
     "vue-router": "^4.0.0",
+    "vue3-google-login": "^2.0.33",
     "vue3-google-map": "^0.22.0"
   },
   "devDependencies": {

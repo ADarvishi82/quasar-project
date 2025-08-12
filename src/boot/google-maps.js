@@ -1,27 +1,28 @@
 // src/boot/google-maps.js
 import { boot } from 'quasar/wrappers';
-// به جای default import، سعی کنید ببینید آیا named export وجود دارد
-// این فقط یک حدس است، باید مستندات پکیج را بررسی کنید
-import { VueGoogleMapsPlugin } from 'vue3-google-map'; // یا نام مشابهی مثل createGoogleMaps
+// به جای default یا named import، همه چیز را به صورت یک namespace وارد کن
+import * as VueGoogleMapAll from 'vue3-google-map';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDnWWhRvds75DoC8HIVwhq4rAlzZQkGGrI';
 
 export default boot(({ app }) => {
-  if (!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY.startsWith('YOUR_GOOGLE_MAPS_API_KEY')) {
-    console.warn('Google Maps API Key is not properly configured...');
+  // برای دیباگ، ببینیم چه چیزی داخل VueGoogleMapAll است
+  console.log("VueGoogleMap exports:", VueGoogleMapAll);
+
+  // کتابخانه ممکن است پلاگین را در یک پراپرتی default داخل این آبجکت قرار دهد
+  const VueGoogleMap = VueGoogleMapAll.default || VueGoogleMapAll;
+
+  if (!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY') {
+    console.warn('Google Maps API Key is not configured.');
     return;
   }
 
-  // اگر VueGoogleMapsPlugin یک تابع یا آبجکت پلاگین است
-  if (typeof VueGoogleMapsPlugin === 'function' || typeof VueGoogleMapsPlugin === 'object') {
-    app.use(VueGoogleMapsPlugin, { // <<<< اینجا از VueGoogleMapsPlugin استفاده کنید
-      load: {
-        key: GOOGLE_MAPS_API_KEY,
-        libraries: "places,geocoding",
-      },
-    });
-    console.log("Google Maps plugin (named import) registered with API Key.");
-  } else {
-    console.error("Failed to import VueGoogleMaps plugin correctly. Check the import statement.");
-  }
+  // حالا از متغیر VueGoogleMap استفاده کن
+  app.use(VueGoogleMap, {
+    load: {
+      key: GOOGLE_MAPS_API_KEY,
+      libraries: "places,geocoding",
+    },
+  });
+  console.log("Attempted to register Google Maps plugin.");
 });

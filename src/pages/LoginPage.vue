@@ -19,7 +19,6 @@
             autocomplete="username"
             name="username"
           />
-
           <q-input
             filled
             type="password"
@@ -31,11 +30,9 @@
             autocomplete="current-password"
             name="password"
           />
-
           <div v-if="errorMessage" class="text-negative q-mb-sm text-caption">
             <q-icon name="warning" class="q-mr-xs" />{{ errorMessage }}
           </div>
-
           <q-btn
             label="ورود"
             type="submit"
@@ -48,10 +45,21 @@
         </q-form>
       </q-card-section>
 
+      <q-card-section>
+        <q-separator class="q-my-md" inset><span class="text-grey-7">یا</span></q-separator>
+        <div class="column items-center q-gutter-y-sm">
+          <!-- کامپوننت جدید برای لاگین با گوگل -->
+          <GoogleLogin :callback="handleGoogleLoginCallback" />
+          <div v-if="googleErrorMessage" class="text-negative q-mt-sm text-caption full-width text-center">
+            {{ googleErrorMessage }}
+          </div>
+        </div>
+      </q-card-section>
+
       <q-card-section class="text-center q-pt-none">
         <div class="text-grey-8">
           حساب کاربری ندارید؟
-          <router-link to="/register" class="text-primary text-weight-bold" style="text-decoration: none">
+          <router-link to="/register" class="text-secondary text-weight-bold" style="text-decoration: none">
             ثبت نام کنید
           </router-link>
         </div>
@@ -62,50 +70,77 @@
 
 <script setup>
 import { ref } from 'vue';
+import { GoogleLogin } from 'vue3-google-login'; // <<<< ایمپورت کامپوننت جدید
 import { useAuthStore } from 'stores/auth-store';
 import { useRouter } from 'vue-router';
-import { useQuasar } from 'quasar'; // برای استفاده از $q.notify
+import { useQuasar } from 'quasar';
+import { api } from 'boot/axios';
 
 const loginIdentifier = ref('');
 const password = ref('');
 const loading = ref(false);
 const errorMessage = ref('');
+const googleErrorMessage = ref(''); // خطای جداگانه برای گوگل
 
 const authStore = useAuthStore();
 const router = useRouter();
-const $q = useQuasar(); // نمونه Quasar برای دسترسی به پلاگین‌ها
+const $q = useQuasar();
 
+// تابع برای لاگین معمولی
 async function handleLogin() {
   errorMessage.value = '';
-  if (!loginIdentifier.value || !password.value) {
-    errorMessage.value = 'لطفا تمام فیلدها را پر کنید.';
-    $q.notify({ type: 'warning', message: errorMessage.value, position: 'top' });
-    return;
-  }
   loading.value = true;
-
-  const credentials = {
-    username: loginIdentifier.value, // بک‌اند شما این فیلد را برای نام کاربری/ایمیل می‌پذیرد
-    password: password.value
-  };
-
-  console.log("LOGIN_PAGE: Sending credentials to store:", credentials);
-
+  const credentials = { username: loginIdentifier.value, password: password.value };
   const result = await authStore.login(credentials);
   loading.value = false;
-
   if (result.success) {
-    console.log("LOGIN_PAGE: Login reported as successful by store. User:", result.user);
     $q.notify({ type: 'positive', message: 'ورود با موفقیت انجام شد!', position: 'top' });
-    router.push('/'); // یا مسیر داشبورد
+    router.push('/');
   } else {
-    console.log("LOGIN_PAGE: Login reported as failed by store. Message:", result.message);
     errorMessage.value = result.message || "خطای نامشخص در ورود.";
-    $q.notify({ type: 'negative', message: errorMessage.value, position: 'top' });
   }
 }
+
+// تابع callback برای لاگین با گوگل
+const handleGoogleLoginCallback = async (response) => {
+  googleErrorMessage.value = '';
+  console.log("Google response received:", response);
+
+  if (!response.credential) {
+    googleErrorMessage.value = 'پاسخ معتبری از گوگل دریافت نشد.';
+    console.error("Credential not found in Google response");
+    return;
+  }
+
+  try {
+    // ارسال id_token (که در فیلد credential است) به بک‌اند
+    const backendResponse = await api.post('/api/auth/google/', {
+      id_token: response.credential,
+    });
+
+    const { key, user, refresh_token } = backendResponse.data;
+    if (!key || !user) { throw new Error('پاسخ سرور معتبر نیست.'); }    if (!key || !user) {
+      throw new Error('پاسخ سرور برای ورود با گوگل معتبر نیست.');
+    }
+
+    // استفاده از اکشن setTokenAndUser برای لاگین کردن کاربر
+    await authStore.setTokenAndUser({
+    access: key,
+    refresh: refresh_token,
+    user: user
+  });
+
+    $q.notify({ type: 'positive', message: 'ورود با گوگل موفقیت‌آمیز بود!' });
+    router.push('/');
+
+  } catch (error) {
+    console.error("Google login backend error:", error.response?.data || error);
+    googleErrorMessage.value = 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.';
+    authStore.logout();
+  }
+};
 </script>
 
 <style scoped>
-/* می‌توانید استایل‌های سفارشی خود را اینجا اضافه کنید */
+/* استایل‌های لازم */
 </style>

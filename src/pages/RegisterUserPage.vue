@@ -9,72 +9,26 @@
 
       <q-card-section>
         <q-form @submit.prevent="handleRegister" class="q-gutter-md">
-          <q-input
-            filled
-            v-model="formData.username"
-            label="نام کاربری"
-            lazy-rules
-            :rules="[val => !!val || 'لطفا نام کاربری را وارد کنید']"
-            outlined
-            autocomplete="username"
-          />
-
-          <q-input
-            filled
-            v-model="formData.email"
-            type="email"
-            label="آدرس ایمیل"
-            lazy-rules
-            :rules="[
-              val => !!val || 'لطفا ایمیل را وارد کنید',
-              val => /.+@.+\..+/.test(val) || 'ایمیل معتبر نیست'
-            ]"
-            outlined
-            autocomplete="email"
-          />
-
-          <q-input
-            filled
-            type="password"
-            v-model="formData.password"
-            label="رمز عبور"
-            lazy-rules
-            :rules="[
-              val => !!val || 'لطفا رمز عبور را وارد کنید',
-              val => val.length >= 8 || 'رمز عبور باید حداقل ۸ کاراکتر باشد'
-            ]"
-            outlined
-            autocomplete="new-password"
-          />
-
-          <q-input
-            filled
-            type="password"
-            v-model="formData.password2"
-            label="تکرار رمز عبور"
-            lazy-rules
-            :rules="[
-              val => !!val || 'لطفا تکرار رمز عبور را وارد کنید',
-              val => val === formData.password || 'رمزهای عبور مطابقت ندارند'
-            ]"
-            outlined
-            autocomplete="new-password"
-          />
-
+          <q-input filled v-model="formData.username" label="نام کاربری" lazy-rules :rules="[val => !!val || 'لطفا نام کاربری را وارد کنید']" outlined autocomplete="username" />
+          <q-input filled v-model="formData.email" type="email" label="آدرس ایمیل" lazy-rules :rules="[ val => !!val || 'لطفا ایمیل را وارد کنید', val => /.+@.+\..+/.test(val) || 'ایمیل معتبر نیست' ]" outlined autocomplete="email" />
+          <q-input filled type="password" v-model="formData.password" label="رمز عبور" lazy-rules :rules="[ val => !!val || 'لطفا رمز عبور را وارد کنید', val => val.length >= 8 || 'رمز عبور باید حداقل ۸ کاراکتر باشد' ]" outlined autocomplete="new-password" />
+          <q-input filled type="password" v-model="formData.password2" label="تکرار رمز عبور" lazy-rules :rules="[ val => !!val || 'لطفا تکرار رمز عبور را وارد کنید', val => val === formData.password || 'رمزهای عبور مطابقت ندارند' ]" outlined autocomplete="new-password" />
           <div v-if="errorMessage" class="text-negative q-mb-sm text-caption" style="white-space: pre-line;">
             <q-icon name="warning" class="q-mr-xs" />{{ errorMessage }}
           </div>
-
-          <q-btn
-            label="ثبت نام کاربر عادی"
-            type="submit"
-            color="primary"
-            class="full-width q-py-sm"
-            :loading="loading"
-            unelevated
-            size="lg"
-          />
+          <q-btn label="ثبت نام کاربر عادی" type="submit" color="primary" class="full-width q-py-sm" :loading="loading" unelevated size="lg" />
         </q-form>
+      </q-card-section>
+
+      <q-card-section>
+        <q-separator class="q-my-md" inset><span class="text-grey-7">یا</span></q-separator>
+        <div class="column items-center q-gutter-y-sm">
+          <!-- کامپوننت جدید برای ثبت نام با گوگل -->
+          <GoogleLogin :callback="handleGoogleLoginCallback" />
+          <div v-if="googleErrorMessage" class="text-negative q-mt-sm text-caption full-width text-center">
+            {{ googleErrorMessage }}
+          </div>
+        </div>
       </q-card-section>
 
       <q-card-section class="text-center q-pt-none">
@@ -96,77 +50,63 @@
 
 <script setup>
 import { ref } from 'vue';
+import { GoogleLogin } from 'vue3-google-login';
 import { useAuthStore } from 'stores/auth-store';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import { api } from 'boot/axios';
 
-const formData = ref({
-  username: '',
-  email: '',
-  password: '',
-  password2: '',
-});
+const formData = ref({ username: '', email: '', password: '', password2: '' });
 const loading = ref(false);
 const errorMessage = ref('');
+const googleErrorMessage = ref('');
 
 const authStore = useAuthStore();
 const router = useRouter();
 const $q = useQuasar();
 
-function showNotification(type, message) {
-  if ($q && typeof $q.notify === 'function') {
-    $q.notify({ type, message, position: 'top', html: type === 'negative', timeout: type === 'negative' ? 7000 : 3000 });
-  } else {
-    console.warn(`Quasar Notify is not available. Type: ${type}, Message: ${message}`);
-    if (type === 'negative' || type === 'warning') {
-        errorMessage.value = message;
-    }
-  }
-}
-
 async function handleRegister() {
   errorMessage.value = '';
-  if (!formData.value.username || !formData.value.email || !formData.value.password || !formData.value.password2) {
-    showNotification('warning', 'لطفا تمام فیلدها را پر کنید.');
-    return;
-  }
-  if (formData.value.password !== formData.value.password2) {
-    showNotification('warning', 'رمزهای عبور مطابقت ندارند.');
-    return;
-  }
-  if (formData.value.password.length < 8) {
-    showNotification('warning', 'رمز عبور باید حداقل ۸ کاراکتر باشد.');
-    return;
-  }
-
   loading.value = true;
-
   const registrationPayload = {
-    username: formData.value.username,
-    email: formData.value.email,
-    password1: formData.value.password, // ارسال به بک‌اند با نام password1
-    password2: formData.value.password2,
-    // is_business_registration: false, // (اختیاری) اگر می‌خواهید به بک‌اند اطلاع دهید
+      username: formData.value.username, email: formData.value.email,
+      password1: formData.value.password, password2: formData.value.password2,
   };
-
-  console.log("REGISTER_USER_PAGE: Sending registration data to store:", registrationPayload);
-
-  // از همان اکشن register قبلی استفاده می‌کنیم
-  // اگر می‌خواهید نوع را مشخص کنید، می‌توانید یک پارامتر دوم به اکشن register اضافه کنید
-  // const result = await authStore.register(registrationPayload, 'user');
-  const result = await authStore.register(registrationPayload); // فعلا بدون نوع
+  const result = await authStore.register(registrationPayload);
   loading.value = false;
-
   if (result.success) {
-    console.log("REGISTER_USER_PAGE: Registration successful. Data:", result.data);
-    showNotification('positive', 'ثبت نام با موفقیت انجام شد! لطفاً وارد شوید.');
-    router.push('/login');
+      $q.notify({ type: 'positive', message: 'ثبت نام با موفقیت انجام شد! لطفاً وارد شوید.' });
+      router.push('/login');
   } else {
-    console.log("REGISTER_USER_PAGE: Registration failed. Message:", result.message);
-    const msg = result.message || "خطای نامشخص در ثبت نام.";
-    showNotification('negative', msg);
+      errorMessage.value = result.message || "خطای نامشخص در ثبت نام.";
+      $q.notify({ type: 'negative', message: errorMessage.value, html: true });
   }
 }
+
+// تابع callback برای لاگین با گوگل (مشابه LoginPage)
+const handleGoogleLoginCallback = async (response) => {
+  googleErrorMessage.value = '';
+  if (!response.credential) {
+    googleErrorMessage.value = 'پاسخ معتبری از گوگل دریافت نشد.';
+    return;
+  }
+  try {
+    const backendResponse = await api.post('/api/auth/google/', { // از users/urls.py می‌آید چون پیشوند /api/ دارد
+    id_token: response.credential,});
+    const { key, user, refresh_token } = backendResponse.data;
+    if (!key || !user) { throw new Error('پاسخ سرور معتبر نیست.'); }
+    await authStore.setTokenAndUser({
+    access: key,
+    refresh: refresh_token,
+    user: user
+  });
+    $q.notify({ type: 'positive', message: 'ورود/ثبت نام با گوگل موفقیت‌آمیز بود!' });
+    router.push('/');
+  } catch (error) {
+    console.error("Google login/register error:", error);
+    googleErrorMessage.value = 'خطا در ارتباط با سرور.';
+  }
+};
 </script>
 
 <style scoped>

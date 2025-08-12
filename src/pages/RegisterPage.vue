@@ -81,6 +81,21 @@
         </q-form>
       </q-card-section>
 
+      <!-- بخش اضافه شده برای گوگل -->
+      <q-card-section>
+        <q-separator class="q-my-md" />
+        <div class="row items-center justify-center">
+          <q-btn
+            label="ادامه با گوگل"
+            @click="handleGoogleLogin"
+            color="red"
+            unelevated
+            icon="img:https://developers.google.com/identity/images/g-logo.png"
+            :loading="googleLoading"
+          />
+        </div>
+      </q-card-section>
+
       <q-card-section class="text-center q-pt-none">
         <div class="text-grey-8">
           قبلاً ثبت نام کرده‌اید؟
@@ -94,52 +109,50 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import { useAuthStore } from 'stores/auth-store';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import api from 'src/boot/axios';
 
 const username = ref('');
 const email = ref('');
-const password = ref(''); // مقدار از فیلد اول پسورد
-const password2 = ref(''); // مقدار از فیلد دوم پسورد (تکرار)
+const password = ref('');
+const password2 = ref('');
 const loading = ref(false);
 const errorMessage = ref('');
+const googleLoading = ref(false);
 
 const authStore = useAuthStore();
 const router = useRouter();
 const $q = useQuasar();
+const VueGAuth = inject('VueGAuth');
 
-// تابع کمکی برای نمایش Notify با بررسی وجود $q.notify
 function showNotification(type, message) {
   if ($q && typeof $q.notify === 'function') {
     $q.notify({ type, message, position: 'top', html: type === 'negative', timeout: type === 'negative' ? 7000 : 3000 });
   } else {
     console.warn(`Quasar Notify is not available. Type: ${type}, Message: ${message}`);
-    // اگر Notify در دسترس نیست، حداقل پیام خطا را در errorMessage بگذاریم
     if (type === 'negative' || type === 'warning') {
-        errorMessage.value = message;
+      errorMessage.value = message;
     }
   }
 }
 
 async function handleRegister() {
-  errorMessage.value = ''; // پاک کردن پیام خطای قبلی
+  errorMessage.value = '';
 
   if (!username.value || !email.value || !password.value || !password2.value) {
-    const msg = 'لطفا تمام فیلدها را پر کنید.';
-    showNotification('warning', msg);
+    showNotification('warning', 'لطفا تمام فیلدها را پر کنید.');
     return;
   }
   if (password.value !== password2.value) {
-    const msg = 'رمزهای عبور مطابقت ندارند.';
-    showNotification('warning', msg);
+    showNotification('warning', 'رمزهای عبور مطابقت ندارند.');
     return;
   }
   if (password.value.length < 8) {
-      const msg = 'رمز عبور باید حداقل ۸ کاراکتر باشد.';
-      showNotification('warning', msg);
-      return;
+    showNotification('warning', 'رمز عبور باید حداقل ۸ کاراکتر باشد.');
+    return;
   }
 
   loading.value = true;
@@ -147,28 +160,48 @@ async function handleRegister() {
   const registrationData = {
     username: username.value,
     email: email.value,
-    password1: password.value,  // <<<< تغییر اصلی: ارسال مقدار فیلد اول پسورد با کلید password1
-    password2: password2.value, // این معمولاً توسط dj_rest_auth برای تایید استفاده می‌شود
+    password1: password.value,
+    password2: password2.value,
   };
-
-  console.log("REGISTER_PAGE: Sending registration data to store:", registrationData);
 
   const result = await authStore.register(registrationData);
   loading.value = false;
 
   if (result.success) {
-    console.log("REGISTER_PAGE: Registration reported as successful by store. Data:", result.data);
     showNotification('positive', 'ثبت نام با موفقیت انجام شد! لطفاً وارد شوید.');
-    router.push('/login'); // هدایت به صفحه ورود
+    router.push('/login');
   } else {
-    console.log("REGISTER_PAGE: Registration reported as failed by store. Message:", result.message);
-    const msg = result.message || "خطای نامشخص در ثبت نام.";
-    showNotification('negative', msg);
-    // errorMessage.value در اینجا هم توسط showNotification تنظیم می‌شود اگر Notify در دسترس نباشد
+    showNotification('negative', result.message || 'خطای نامشخص در ثبت نام.');
+  }
+}
+
+async function handleGoogleLogin() {
+  googleLoading.value = true;
+  try {
+    const googleUser = await VueGAuth.signIn();
+    if (!googleUser) throw new Error('Google sign in failed.');
+
+    const accessToken = googleUser.getAuthResponse().access_token;
+    const backendResponse = await api.post('/api/auth/google/', {
+      access_token: accessToken,
+    });
+
+    const { key } = backendResponse.data;
+    const user = backendResponse.data.user;
+
+    await authStore.setTokenAndUser({ access: key, user });
+    showNotification('positive', 'ورود با گوگل موفقیت‌آمیز بود!');
+    router.push('/');
+  } catch (error) {
+    console.error("Google login error:", error);
+    showNotification('negative', 'خطا در ورود با گوگل.');
+    authStore.logout();
+  } finally {
+    googleLoading.value = false;
   }
 }
 </script>
 
 <style scoped>
-/* می‌توانید استایل‌های سفارشی خود را اینجا اضافه کنید */
+/* استایل‌های سفارشی خودت رو می‌تونی اینجا بنویسی */
 </style>
