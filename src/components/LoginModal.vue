@@ -320,7 +320,7 @@ function switchToRegister() {
   text-align: right;
 }
 .form-options {
-  direction: ltr; /* To keep checkbox on the left */
+  direction: ltr;
   text-align: right;
 }
 /* -------------------------- */
@@ -330,7 +330,8 @@ function switchToRegister() {
   max-width: 500px;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(11, 196, 20, 0.15);
+  background: linear-gradient(135deg, #e8f5e8 0%, #ffffff 100%);
 
   /* --- تغییرات اصلی برای اسکرول --- */
   display: flex;
@@ -356,21 +357,21 @@ function switchToRegister() {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    background: linear-gradient(135deg, #0eaa15 0%, #81c784 100%);
     z-index: 1;
   }
 
   .header-content {
     position: relative;
     z-index: 2;
-    padding: 1.5rem 2rem; /* Reduced padding */
-    color: white;
+    padding: 1.5rem 2rem;
+    color: #000000;
     display: flex;
     align-items: center;
     gap: 1rem;
 
     .header-icon {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.3);
       border-radius: 50%;
       padding: 1rem;
       backdrop-filter: blur(10px);
@@ -380,22 +381,24 @@ function switchToRegister() {
       flex: 1;
 
       .dialog-title {
-        margin: 0 0 0.25rem 0; /* Reduced margin */
+        margin: 0 0 0.25rem 0;
         font-size: 1.5rem;
         font-weight: 700;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        color: #000000;
+        text-shadow: none;
       }
 
       .dialog-subtitle {
         margin: 0;
-        opacity: 0.9;
+        color: #000000;
+        opacity: 0.8;
         font-size: 0.95rem;
       }
     }
 
     .close-btn {
       background: rgba(255, 255, 255, 0.2);
-      color: white;
+      color: #000000;
       backdrop-filter: blur(10px);
 
       &:hover {
@@ -406,16 +409,17 @@ function switchToRegister() {
 }
 
 .welcome-section {
-  background: linear-gradient(90deg, #f8f9ff 0%, #f0f4ff 100%);
-  padding: 1rem 2rem; /* Reduced padding */
-  border-bottom: 1px solid #e1e5e9;
-  flex-shrink: 0; /* Prevent from shrinking */
+  background: linear-gradient(90deg, #a5d6a7 0%, #ffffff 100%);
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #c8e6c9;
+  flex-shrink: 0;
 }
 
 /* --- تغییرات اصلی برای اسکرول --- */
 .form-scroll-container {
   flex: 1;
   overflow-y: auto;
+  background: linear-gradient(135deg, #f1f8e9 0%, #ffffff 100%);
 }
 .form-content-wrapper {
   padding: 1.5rem 2rem;
@@ -423,7 +427,7 @@ function switchToRegister() {
 /* ------------------------------ */
 
 .login-form .form-group {
-  margin-bottom: 1.2rem; /* Reduced margin */
+  margin-bottom: 1.2rem;
 }
 
 /* --- بقیه استایل‌ها --- */
@@ -434,7 +438,7 @@ function switchToRegister() {
 }
 
 .welcome-section .welcome-content .welcome-icon {
-  background: rgba(255, 152, 0, 0.1);
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   padding: 0.75rem;
 }
@@ -443,36 +447,38 @@ function switchToRegister() {
   margin: 0 0 0.25rem 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #000000;
 }
 
 .welcome-section .welcome-content .welcome-text .welcome-description {
   margin: 0;
-  color: #666;
+  color: #000000;
+  opacity: 0.8;
   font-size: 0.9rem;
 }
 
 .login-form .form-group .form-label {
   display: block;
   font-weight: 600;
-  color: #2c3e50;
+  color: #000000;
   margin-bottom: 0.5rem;
   font-size: 0.95rem;
 }
 
 .login-form .form-group .custom-input :deep(.q-field__control) {
   border-radius: 12px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid #c8e6c9;
   transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .login-form .form-group .custom-input :deep(.q-field__control:hover) {
-  border-color: var(--q-primary);
+  border-color: #81c784;
 }
 
 .login-form .form-group .custom-input :deep(.q-field--focused .q-field__control) {
-  border-color: var(--q-primary);
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+  border-color: #66bb6a;
+  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.2);
 }
 
 .login-form .form-group .custom-input :deep(.q-field__prepend .q-icon) {
@@ -484,12 +490,12 @@ function switchToRegister() {
 }
 
 .login-form .form-group .password-toggle {
-  color: #666;
+  color: #000000;
 }
 
 .login-form .form-group .password-toggle:hover {
-  color: var(--q-primary);
-  background: rgba(25, 118, 210, 0.1);
+  color: #66bb6a;
+  background: rgba(102, 187, 106, 0.1);
 }
 
 .login-form .form-options {
@@ -500,20 +506,20 @@ function switchToRegister() {
 }
 
 .login-form .form-options .remember-checkbox :deep(.q-checkbox__label) {
-  color: #666;
+  color: #000000;
   font-size: 0.9rem;
-  padding-right: 0.5em; /* RTL spacing */
+  padding-right: 0.5em;
 }
 
 .login-form .form-options .forgot-link {
-  color: var(--q-primary);
+  color: #66bb6a;
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.3s ease;
 }
 
 .login-form .form-options .forgot-link:hover {
-  color: var(--q-secondary);
+  color: #4caf50;
   text-decoration: underline;
 }
 
@@ -541,27 +547,28 @@ function switchToRegister() {
   border-radius: 12px;
   font-weight: 600;
   font-size: 1rem;
-  background: linear-gradient(135deg, var(--q-primary), #4fc3f7);
+  background: linear-gradient(135deg, #66bb6a, #81c784);
+  color: #000000;
   transition: all 0.3s ease;
 }
 
 .login-form .login-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3);
+  box-shadow: 0 8px 20px rgba(102, 187, 106, 0.3);
 }
 
 .quick-login-section {
   margin: 1.5rem 0;
   padding: 1rem;
-  background: #f8f9ff;
+  background: rgba(232, 245, 232, 0.8);
   border-radius: 12px;
-  border: 1px solid #e1e5e9;
+  border: 1px solid #c8e6c9;
 }
 
 .quick-login-section .quick-login-header {
   display: flex;
   align-items: center;
-  color: #666;
+  color: #000000;
   font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -578,7 +585,7 @@ function switchToRegister() {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  background: white;
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -586,14 +593,14 @@ function switchToRegister() {
 }
 
 .quick-login-section .recent-users .recent-user-item:hover {
-  border-color: var(--q-primary);
+  border-color: #81c784;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(129, 199, 132, 0.2);
 }
 
 .quick-login-section .recent-users .recent-user-item .username {
   font-size: 0.8rem;
-  color: #666;
+  color: #000000;
   font-weight: 500;
 }
 
@@ -610,13 +617,13 @@ function switchToRegister() {
   left: 0;
   right: 0;
   height: 1px;
-  background: #e1e5e9;
+  background: #c8e6c9;
 }
 
 .social-section .divider .divider-text {
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
   padding: 0 1rem;
-  color: #666;
+  color: #000000;
   font-size: 0.9rem;
   position: relative;
   z-index: 1;
@@ -636,17 +643,17 @@ function switchToRegister() {
 
 .dialog-footer {
   padding-top: 1.5rem;
-  border-top: 1px solid #f0f4ff;
+  border-top: 1px solid #c8e6c9;
   margin-top: 1.5rem;
 }
 
 .dialog-footer .footer-text {
-  color: #666;
+  color: #000000;
   font-size: 0.95rem;
 }
 
 .dialog-footer .footer-text .register-link {
-  color: var(--q-secondary);
+  color: #66bb6a;
   font-weight: 600;
   text-decoration: none;
   transition: color 0.3s ease;
@@ -654,7 +661,7 @@ function switchToRegister() {
 }
 
 .dialog-footer .footer-text .register-link:hover {
-  color: var(--q-primary);
+  color: #4caf50;
   text-decoration: underline;
 }
 
@@ -669,11 +676,11 @@ function switchToRegister() {
 
 :deep(.google-login-button:hover) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(102, 187, 106, 0.15);
 }
 
 :deep(.q-loading) {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(232, 245, 232, 0.9);
   backdrop-filter: blur(5px);
 }
 </style>

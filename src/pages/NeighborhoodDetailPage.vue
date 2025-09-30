@@ -22,6 +22,7 @@
     </div>
 
     <div v-else class="q-gutter-y-lg">
+      <!-- Neighborhood Info Card -->
       <q-card flat bordered>
         <q-card-section>
           <div class="text-h4 q-mb-sm text-primary">
@@ -50,7 +51,29 @@
         </q-card-section>
       </q-card>
 
-      <!-- (اختیاری) نمایش لیست خلاصه کاربران در محله -->
+      <!-- ============ Recommendation Section ============ -->
+      <q-card flat bordered class="q-mb-lg">
+        <q-card-section class="row items-center">
+          <q-icon name="lightbulb_outline" color="amber-8" size="md" class="q-mr-md" />
+          <div class="col">
+            <div class="text-subtitle1">تحلیل نیازهای محله</div>
+            <div class="text-caption text-grey-7">ببینید چه کسب‌وکارهایی بر اساس الگوهای موفق، در این محله پتانسیل رشد دارند.</div>
+          </div>
+          <div class="col-auto">
+            <q-btn
+              label="دریافت پیشنهاد"
+              color="amber-8"
+              @click="getRecommendations"
+              :loading="loadingRecommendations"
+              unelevated
+              icon="insights"
+            />
+          </div>
+        </q-card-section>
+      </q-card>
+      <!-- ============================================= -->
+
+      <!-- Users in Neighborhood -->
       <q-card flat bordered v-if="neighborhoodDetail.user_profiles_in_neighborhood && neighborhoodDetail.user_profiles_in_neighborhood.length > 0">
         <q-card-section>
           <div class="text-h6">همسایه‌های این محله</div>
@@ -64,13 +87,12 @@
             </q-item-section>
             <q-item-section>
               <q-item-label>{{ profile.username }}</q-item-label>
-              <!-- می‌توانید لینک به پروفایل کاربر را اینجا قرار دهید اگر صفحه‌ای برای آن دارید -->
             </q-item-section>
           </q-item>
         </q-list>
       </q-card>
 
-      <!-- (اختیاری) نمایش لیست خلاصه کسب‌وکارها در محله -->
+      <!-- Businesses in Neighborhood -->
       <q-card flat bordered v-if="neighborhoodDetail.business_profiles_in_neighborhood && neighborhoodDetail.business_profiles_in_neighborhood.length > 0">
         <q-card-section>
           <div class="text-h6">کسب‌وکارهای این محله</div>
@@ -102,6 +124,47 @@
       <div class="q-mt-lg text-center">
         <q-btn label="بازگشت به لیست محله‌ها" color="primary" icon="arrow_back" to="/neighborhoods" unelevated />
       </div>
+
+      <!-- ============ Recommendations Dialog ============ -->
+      <q-dialog v-model="showRecommendationsDialog">
+        <q-card style="min-width: 400px;">
+          <q-card-section class="row items-center q-pb-none">
+            <div class="text-h6">کسب‌وکارهای پیشنهادی برای محله "{{ neighborhoodDetail.name }}"</div>
+            <q-space />
+            <q-btn icon="close" flat round dense v-close-popup />
+          </q-card-section>
+
+          <q-card-section v-if="loadingRecommendations" class="text-center q-py-xl">
+            <q-spinner-dots color="primary" size="2em" />
+            <div class="q-mt-sm">در حال تحلیل...</div>
+          </q-card-section>
+
+          <q-card-section v-else-if="recommendationError" class="text-negative text-center">
+            {{ recommendationError }}
+          </q-card-section>
+
+          <q-card-section v-else-if="recommendations.length === 0" class="text-grey text-center">
+            در حال حاضر پیشنهاد خاصی برای این محله یافت نشد.
+          </q-card-section>
+
+          <q-list v-else separator bordered>
+            <q-item v-for="(rec, index) in recommendations" :key="rec.business_category">
+              <q-item-section avatar>
+                <q-avatar color="primary" text-color="white" :label="String(index + 1)" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-weight-medium">{{ rec.business_category }}</q-item-label>
+                <q-item-label caption>امتیاز پیشنهاد: {{ rec.score.toFixed(2) }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="trending_up" color="green" />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card>
+      </q-dialog>
+      <!-- ============================================== -->
+
     </div>
   </q-page>
 </template>
@@ -110,9 +173,10 @@
 import { ref, onMounted, watch } from 'vue';
 import { api } from 'boot/axios';
 import { useQuasar } from 'quasar';
+import { useAuthStore } from 'stores/auth-store';
 
 const props = defineProps({
-  id: { // این prop از طریق router (با props: true) پاس داده می‌شود
+  id: {
     type: [String, Number],
     required: true,
   },
@@ -122,20 +186,24 @@ const neighborhoodDetail = ref(null);
 const loading = ref(true);
 const error = ref(false);
 const errorMessage = ref('');
+
+// New refs for recommender system
+const recommendations = ref([]);
+const loadingRecommendations = ref(false);
+const recommendationError = ref('');
+const showRecommendationsDialog = ref(false);
+
 const $q = useQuasar();
+const authStore = useAuthStore();
 
 async function fetchNeighborhoodDetail(neighborhoodId) {
   loading.value = true;
   error.value = false;
   errorMessage.value = '';
   try {
-    console.log(`NEIGHBORHOOD_DETAIL_PAGE: Fetching details for neighborhood ID: ${neighborhoodId}`);
-    // از NeighborhoodDetailSerializer استفاده می‌شود که باید تعداد و لیست پروفایل‌ها را هم برگرداند
     const response = await api.get(`/api/neighborhoods/${neighborhoodId}/`);
     neighborhoodDetail.value = response.data;
-    console.log("NEIGHBORHOOD_DETAIL_PAGE: Neighborhood detail fetched:", neighborhoodDetail.value);
   } catch (err) {
-    console.error("NEIGHBORHOOD_DETAIL_PAGE: Error fetching neighborhood detail:", err.response?.data || err.message);
     error.value = true;
     if (err.response && err.response.status === 404) {
         errorMessage.value = 'محله مورد نظر یافت نشد.';
@@ -150,18 +218,42 @@ async function fetchNeighborhoodDetail(neighborhoodId) {
   }
 }
 
+// New function to call the recommender API
+async function getRecommendations() {
+  if (!authStore.isAuthenticated) {
+    $q.notify({ type: 'negative', message: 'برای استفاده از این قابلیت باید وارد شوید.' });
+    return;
+  }
+
+  loadingRecommendations.value = true;
+  recommendationError.value = '';
+  showRecommendationsDialog.value = true;
+
+  try {
+    const response = await api.get('/api/recommendations/businesses/', {
+      params: {
+        neighborhood_id: props.id
+      }
+    });
+    recommendations.value = response.data;
+  } catch (err) {
+    console.error("Error fetching recommendations:", err.response?.data || err);
+    recommendationError.value = err.response?.data?.error || 'خطا در دریافت پیشنهادها.';
+  } finally {
+    loadingRecommendations.value = false;
+  }
+}
+
 onMounted(() => {
   if (props.id) {
     fetchNeighborhoodDetail(props.id);
   } else {
-    // اگر به هر دلیلی ID وجود نداشت، خطا نمایش بده یا به لیست برگردان
     error.value = true;
     errorMessage.value = "شناسه محله نامعتبر است.";
     loading.value = false;
   }
 });
 
-// اگر ID در URL تغییر کرد، دوباره داده‌ها را واکشی کن
 watch(() => props.id, (newId) => {
   if (newId) {
     fetchNeighborhoodDetail(newId);
@@ -170,5 +262,5 @@ watch(() => props.id, (newId) => {
 </script>
 
 <style scoped>
-/* استایل‌های لازم */
+/* Scoped styles can be added here if needed */
 </style>

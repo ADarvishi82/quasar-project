@@ -471,12 +471,13 @@ function switchToLogin() {
   max-width: 550px;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(27, 94, 32, 0.2);
+  background: linear-gradient(135deg, #dcedc8 0%, #ffffff 100%);
 
   /* --- تغییرات اصلی برای اسکرول --- */
   display: flex;
   flex-direction: column;
-  max-height: 90vh; /* محدودیت ارتفاع */
+  max-height: 90vh;
   /* ------------------------------ */
 
   @media (max-width: 600px) {
@@ -498,7 +499,7 @@ function switchToLogin() {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #10cf19 0%, #537954 100%);
     z-index: 1;
   }
 
@@ -506,13 +507,13 @@ function switchToLogin() {
     position: relative;
     z-index: 2;
     padding: 2rem;
-    color: white;
+    color: #000000;
     display: flex;
     align-items: center;
     gap: 1rem;
 
     .header-icon {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.3);
       border-radius: 50%;
       padding: 1rem;
       backdrop-filter: blur(10px);
@@ -525,19 +526,21 @@ function switchToLogin() {
         margin: 0 0 0.5rem 0;
         font-size: 1.5rem;
         font-weight: 700;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        color: #000000;
+        text-shadow: none;
       }
 
       .dialog-subtitle {
         margin: 0;
-        opacity: 0.9;
+        color: #000000;
+        opacity: 0.8;
         font-size: 0.95rem;
       }
     }
 
     .close-btn {
       background: rgba(255, 255, 255, 0.2);
-      color: white;
+      color: #000000;
       backdrop-filter: blur(10px);
 
       &:hover {
@@ -549,42 +552,41 @@ function switchToLogin() {
 
 .tab-section {
   padding: 0;
-  background: #f8f9ff;
-  border-bottom: 1px solid #e1e5e9;
+  background: linear-gradient(90deg, #179d0996 0%, #ffffff 100%);
+  border-bottom: 1px solid #aed581;
 }
 
 /* --- تغییرات اصلی برای اسکرول --- */
 .form-container {
-  flex: 1; /* این بخش تمام فضای باقی‌مانده را می‌گیرد */
-  overflow-y: auto; /* اسکرول عمودی در صورت نیاز */
+  flex: 1;
+  overflow-y: auto;
   padding: 0;
+  background: linear-gradient(135deg, #e8f5e8 0%, #ffffff 100%);
 }
 /* ------------------------------ */
 
-
 .tab-panel {
-  padding: 1.5rem 2rem; /* کاهش پدینگ */
+  padding: 1.5rem 2rem;
 }
 
 .panel-header {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem; /* کاهش مارجین */
+  margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f4ff;
+  border-bottom: 2px solid #c8e6c9;
 }
 
 .registration-form .form-group {
-  margin-bottom: 1.2rem; /* کاهش مارجین */
+  margin-bottom: 1.2rem;
 }
 
 .dialog-footer {
-  padding: 1rem 2rem 1.5rem; /* کاهش پدینگ */
+  padding: 1rem 2rem 1.5rem;
 }
 
-
-/* --- بقیه استایل‌ها بدون تغییر باقی می‌مانند --- */
+/* --- بقیه استایل‌ها --- */
 .custom-tabs .custom-tab {
   padding: 1rem 1.5rem;
   transition: all 0.3s ease;
@@ -592,7 +594,7 @@ function switchToLogin() {
   background: transparent;
 
   &.tab-active {
-    background: linear-gradient(135deg, var(--q-primary), var(--q-secondary));
+    background: linear-gradient(135deg, #2e7d32, #388e3c);
     color: white;
 
     .tab-content {
@@ -605,13 +607,13 @@ function switchToLogin() {
     align-items: center;
     gap: 0.5rem;
     font-weight: 600;
-    color: #666;
+    color: #000000;
     transition: color 0.3s ease;
   }
 }
 
 .panel-header .panel-icon {
-  background: linear-gradient(135deg, #f0f4ff, #e8f2ff);
+  background: rgba(139, 195, 74, 0.2);
   border-radius: 50%;
   padding: 0.75rem;
 }
@@ -624,35 +626,38 @@ function switchToLogin() {
   margin: 0 0 0.25rem 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #000000;
 }
 
 .panel-header .panel-text .panel-description {
   margin: 0;
-  color: #666;
+  color: #000000;
+  opacity: 0.8;
   font-size: 0.9rem;
 }
 
 .registration-form .form-group .form-label {
   display: block;
   font-weight: 600;
-  color: #2c3e50;
+  color: #000000;
   margin-bottom: 0.5rem;
   font-size: 0.95rem;
 }
 
 .registration-form .form-group .custom-input :deep(.q-field__control) {
   border-radius: 12px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid #aed581;
   transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
 }
+
 .registration-form .form-group .custom-input :deep(.q-field__control:hover) {
-  border-color: var(--q-primary);
+  border-color: #66bb6a;
 }
 
 .registration-form .form-group .custom-input :deep(.q-field--focused .q-field__control) {
-  border-color: var(--q-primary);
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
 }
 
 .registration-form .form-group .custom-input :deep(.q-field__prepend .q-icon) {
@@ -664,12 +669,12 @@ function switchToLogin() {
 }
 
 .registration-form .form-group .password-toggle {
-  color: #666;
+  color: #000000;
 }
 
 .registration-form .form-group .password-toggle:hover {
-  color: var(--q-primary);
-  background: rgba(25, 118, 210, 0.1);
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
 }
 
 .registration-form .error-message {
@@ -698,24 +703,25 @@ function switchToLogin() {
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.3s ease;
+  color: #000000;
 }
 
 .registration-form .submit-btn.user-btn {
-  background: linear-gradient(135deg, var(--q-primary), #4fc3f7);
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
 }
 
 .registration-form .submit-btn.user-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3);
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
 }
 
 .registration-form .submit-btn.business-btn {
-  background: linear-gradient(135deg, var(--q-secondary), #ff7043);
+  background: linear-gradient(135deg, #388e3c, #4caf50);
 }
 
 .registration-form .submit-btn.business-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(156, 39, 176, 0.3);
+  box-shadow: 0 8px 20px rgba(56, 142, 60, 0.4);
 }
 
 .social-section {
@@ -735,13 +741,13 @@ function switchToLogin() {
   left: 0;
   right: 0;
   height: 1px;
-  background: #e1e5e9;
+  background: #aed581;
 }
 
 .social-section .divider .divider-text {
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
   padding: 0 1rem;
-  color: #666;
+  color: #000000;
   font-size: 0.9rem;
   position: relative;
   z-index: 1;
@@ -760,20 +766,20 @@ function switchToLogin() {
 }
 
 .dialog-footer .footer-text {
-  color: #666;
+  color: #000000;
   font-size: 0.95rem;
 }
 
 .dialog-footer .footer-text .login-link {
-  color: var(--q-secondary);
+  color: #08810e;
   font-weight: 600;
   text-decoration: none;
   transition: color 0.3s ease;
-  margin-right: 5px; /* Added for better spacing in RTL */
+  margin-right: 5px;
 }
 
 .dialog-footer .footer-text .login-link:hover {
-  color: var(--q-primary);
+  color: #2e7d32;
   text-decoration: underline;
 }
 
@@ -788,11 +794,11 @@ function switchToLogin() {
 
 :deep(.google-login-button:hover) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(2, 33, 3, 0.2);
 }
 
 :deep(.q-loading) {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(220, 237, 200, 0.9);
   backdrop-filter: blur(5px);
 }
 

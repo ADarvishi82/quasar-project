@@ -602,7 +602,7 @@ onMounted(() => {
 
 /* Header Styles */
 .page-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #66a267 0%, #08b406 100%);
   color: white;
   padding: 3rem 0 2rem;
   margin-bottom: 2rem;
@@ -656,11 +656,11 @@ onMounted(() => {
 .glass-effect {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(13, 183, 7, 0.2);
 }
 
 .card-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #08af26 0%, #60c462 100%);
   color: white;
   padding: 1.5rem;
 }
@@ -706,7 +706,7 @@ onMounted(() => {
 }
 
 .profile-avatar.has-image {
-  border-color: #667eea;
+  border-color: #025f12;
   transform: scale(1.02);
 }
 
@@ -714,7 +714,7 @@ onMounted(() => {
   position: absolute;
   bottom: 0;
   right: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #327409 0%, #5ca90a 100%);
   border: 2px solid white;
   transition: all 0.3s ease;
 }
@@ -746,7 +746,7 @@ onMounted(() => {
 }
 
 .label-icon {
-  color: #667eea;
+  color: #07a50c;
   font-size: 1.1rem;
 }
 
@@ -756,7 +756,7 @@ onMounted(() => {
 
 .address-input:focus-within {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 8px 25px rgba(7, 169, 20, 0.15);
 }
 
 .search-btn {
@@ -802,7 +802,7 @@ onMounted(() => {
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #04ab0a 0%, #15a505 100%);
   border-radius: 12px;
   padding: 0.75rem 2rem;
   font-weight: 600;
@@ -813,7 +813,7 @@ onMounted(() => {
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 25px rgba(9, 175, 3, 0.3);
 }
 
 /* Posts Section */
@@ -846,7 +846,7 @@ onMounted(() => {
 
 .posts-icon {
   font-size: 2rem;
-  color: #667eea;
+  color: #07aa1a;
 }
 
 .posts-title {
@@ -863,7 +863,7 @@ onMounted(() => {
 }
 
 .create-post-btn {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #08b60b 0%, #01a609 100%);
   border-radius: 25px;
   padding: 0.5rem 1.5rem;
   font-weight: 600;
@@ -872,7 +872,7 @@ onMounted(() => {
 
 .create-post-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(245, 87, 108, 0.3);
+  box-shadow: 0 8px 25px rgba(21, 176, 4, 0.3);
 }
 
 /* Posts Content */
@@ -1012,7 +1012,7 @@ onMounted(() => {
 }
 
 .post-menu:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(6, 164, 27, 0.1);
   transform: scale(1.1);
 }
 
@@ -1028,12 +1028,12 @@ onMounted(() => {
 }
 
 .menu-item:hover {
-  background: rgba(102, 126, 234, 0.05);
+  background: rgba(12, 199, 40, 0.05);
   transform: translateX(4px);
 }
 
 .delete-item:hover {
-  background: rgba(244, 67, 54, 0.05);
+  background: rgba(7, 172, 5, 0.05);
 }
 
 /* Post Text */
@@ -1043,7 +1043,7 @@ onMounted(() => {
 
 .post-content-text {
   line-height: 1.6;
-  color: #444;
+  color: #13c50d;
   font-size: 1rem;
   margin: 0;
   display: -webkit-box;
@@ -1127,17 +1127,17 @@ onMounted(() => {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #18a006 0%, #05ae19 100%);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  background: linear-gradient(135deg, #059d0f 0%, #069c15 100%);
 }
 
 /* Focus States */
 .q-field--focused .q-field__control {
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 0 0 2px rgba(1, 182, 23, 0.2);
 }
 
 /* Button Hover Effects */

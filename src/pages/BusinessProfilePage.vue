@@ -751,7 +751,7 @@ watch(() => authStore.isAuthenticated, (newAuthStatus) => {
 
 <style scoped lang="scss">
 .business-profile-page {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #08ae24 0%, #88cf79 100%);
   min-height: 100vh;
 }
 

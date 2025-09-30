@@ -23,97 +23,96 @@
         />
       </div>
 
-      <div class="row q-col-gutter-lg">
-        <!-- Filter Sidebar -->
-        <div class="col-12 col-md-3">
-          <q-card class="filter-sidebar sticky-sidebar" flat bordered>
-            <q-card-section>
-              <div class="text-h6">فیلترها</div>
-            </q-card-section>
-            <q-separator />
-            <q-card-section class="q-gutter-y-lg">
-              <div>
-                <div class="text-subtitle2 q-mb-sm">محله</div>
-                <q-select v-model="filters.neighborhood" :options="neighborhoodOptions" label="همه محله‌ها" filled dense emit-value map-options option-value="id" option-label="name" clearable :loading="loadingNeighborhoods" />
+      <!-- Filter Sidebar - Moved Above Grid -->
+      <q-card class="filter-sidebar q-mb-lg" flat bordered>
+        <q-card-section>
+          <div class="text-h6">فیلترها</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <div class="row q-col-gutter-lg">
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="text-subtitle2 q-mb-sm">محله</div>
+              <q-select v-model="filters.neighborhood" :options="neighborhoodOptions" label="همه محله‌ها" filled dense emit-value map-options option-value="id" option-label="name" clearable :loading="loadingNeighborhoods" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="text-subtitle2 q-mb-sm">محدوده قیمت (تومان)</div>
+              <q-range v-model="priceRange" :min="0" :max="5000000" :step="50000" label-always class="q-px-sm" />
+              <div class="row justify-between text-caption q-mt-sm">
+                <span>{{ priceRange.min.toLocaleString() }}</span>
+                <span>{{ priceRange.max.toLocaleString() }}</span>
               </div>
-              <div>
-                <div class="text-subtitle2 q-mb-sm">محدوده قیمت (تومان)</div>
-                <q-range v-model="priceRange" :min="0" :max="5000000" :step="50000" label-always class="q-px-sm" />
-                <div class="row justify-between text-caption q-mt-sm">
-                  <span>{{ priceRange.min.toLocaleString() }}</span>
-                  <span>{{ priceRange.max.toLocaleString() }}</span>
-                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="text-subtitle2 q-mb-sm">امتیاز</div>
+              <q-select v-model="filters.min_rating" :options="ratingOptions" label="همه امتیازها" filled dense emit-value map-options option-value="value" option-label="label" clearable />
+            </div>
+            <div class="col-12 col-sm-6 col-md-3 flex items-end">
+              <div class="row q-gutter-sm full-width">
+                <q-btn label="اعمال فیلتر" color="primary" @click="applyFilters" unelevated class="col" :loading="loadingBusinesses" />
+                <q-btn label="پاک کردن" @click="resetFilters" flat class="col-auto" />
               </div>
-              <div>
-                <div class="text-subtitle2 q-mb-sm">امتیاز</div>
-                <q-option-group v-model="filters.min_rating" :options="ratingOptions" color="primary" />
-              </div>
-            </q-card-section>
-            <q-separator />
-            <q-card-actions class="q-pa-md q-gutter-sm">
-              <q-btn label="اعمال فیلتر" color="primary" @click="applyFilters" unelevated class="col" :loading="loadingBusinesses" />
-              <q-btn label="پاک کردن" @click="resetFilters" flat class="col-auto" />
-            </q-card-actions>
-          </q-card>
-        </div>
-
-        <!-- Main Content -->
-        <div class="col-12 col-md-9">
-          <!-- Sort & Count Header -->
-          <div class="row items-center q-mb-md">
-            <div class="text-subtitle1 text-grey-8">{{ totalBusinesses }} خدمت یافت شد</div>
-            <q-space />
-            <q-select v-model="sortBy" :options="sortOptions" label="مرتب‌سازی" filled dense emit-value map-options style="min-width: 180px;" @update:model-value="applyFilters" />
-          </div>
-
-          <!-- States (Loading, Error, Empty) -->
-          <div v-if="loadingBusinesses" class="text-center q-py-xl"><q-spinner-dots color="primary" size="3em" /></div>
-          <div v-else-if="errorBusinesses" class="text-center q-py-xl text-negative">خطا در دریافت اطلاعات.</div>
-          <div v-else-if="businesses.length === 0" class="text-center q-py-xl text-grey">هیچ خدمتی با این مشخصات یافت نشد.</div>
-
-          <!-- Businesses Grid -->
-          <div v-else class="row q-col-gutter-md">
-            <div v-for="biz in businesses" :key="biz.id" class="col-12 col-sm-6 col-lg-4">
-              <q-card class="business-card full-height cursor-pointer" @click="goToBusinessDetail(biz.id)">
-                <q-img :src="biz.logo_url || 'https://cdn.quasar.dev/img/material.png'" :ratio="4/3">
-                  <q-chip v-if="biz.category" :label="biz.category.name" color="white" text-color="primary" class="absolute-bottom-left q-ma-sm" size="sm" />
-                </q-img>
-                <q-card-section>
-                  <div class="row items-center no-wrap">
-                    <div class="col">
-                      <div class="text-h6 ellipsis">{{ biz.business_name }}</div>
-                      <div class="text-caption text-grey-7 ellipsis"><q-icon name="location_on" size="xs" /> {{ biz.neighborhood ? biz.neighborhood.name : 'نامشخص' }}</div>
-                    </div>
-                    <div v-if="biz.rating_count > 0" class="col-auto text-right">
-                      <q-rating v-model="biz.average_rating" :max="5" size="16px" color="orange" icon="star" readonly />
-                      <div class="text-caption text-grey-7 q-ml-xs">({{ biz.rating_count }})</div>
-                    </div>
-                  </div>
-                </q-card-section>
-                <q-card-section class="q-pt-none">
-                  <div class="text-h6 text-green-8 text-weight-bold">
-                    {{ biz.price_string || 'تماس بگیرید' }}
-                  </div>
-                </q-card-section>
-                <q-separator />
-                <q-card-actions class="q-px-md q-py-sm">
-                  <q-avatar size="30px">
-                    <img v-if="biz.user.profile?.profile_picture_url" :src="biz.user.profile.profile_picture_url">
-                    <q-icon v-else name="account_circle" />
-                  </q-avatar>
-                  <span class="q-ml-sm text-grey-8">{{ biz.user.username }}</span>
-                  <q-space />
-                  <q-btn label="جزئیات" color="primary" flat dense :to="`/business/${biz.id}`" />
-                  <q-btn label="رزرو" color="primary" unelevated dense />
-                </q-card-actions>
-              </q-card>
             </div>
           </div>
+        </q-card-section>
+      </q-card>
 
-          <!-- Pagination -->
-          <div class="q-pa-lg flex flex-center" v-if="totalPages > 1">
-            <q-pagination v-model="currentPage" :max="totalPages" @update:model-value="applyFilters" direction-links />
+      <!-- Main Content -->
+      <div>
+        <!-- Sort & Count Header -->
+        <div class="row items-center q-mb-md">
+          <div class="text-subtitle1 text-grey-8">{{ totalBusinesses }} خدمت یافت شد</div>
+          <q-space />
+          <q-select v-model="sortBy" :options="sortOptions" label="مرتب‌سازی" filled dense emit-value map-options style="min-width: 180px;" @update:model-value="applyFilters" />
+        </div>
+
+        <!-- States (Loading, Error, Empty) -->
+        <div v-if="loadingBusinesses" class="text-center q-py-xl"><q-spinner-dots color="primary" size="3em" /></div>
+        <div v-else-if="errorBusinesses" class="text-center q-py-xl text-negative">خطا در دریافت اطلاعات.</div>
+        <div v-else-if="businesses.length === 0" class="text-center q-py-xl text-grey">هیچ خدمتی با این مشخصات یافت نشد.</div>
+
+        <!-- Businesses Grid -->
+        <div v-else class="row q-col-gutter-md">
+          <div v-for="biz in businesses" :key="biz.id" class="col-12 col-sm-6 col-lg-4">
+            <q-card class="business-card full-height cursor-pointer" @click="goToBusinessDetail(biz.id)">
+              <q-img :src="biz.logo_url || 'https://cdn.quasar.dev/img/material.png'" :ratio="4/3">
+                <q-chip v-if="biz.category" :label="biz.category.name" color="white" text-color="primary" class="absolute-bottom-left q-ma-sm" size="sm" />
+              </q-img>
+              <q-card-section>
+                <div class="row items-center no-wrap">
+                  <div class="col">
+                    <div class="text-h6 ellipsis">{{ biz.business_name }}</div>
+                    <div class="text-caption text-grey-7 ellipsis"><q-icon name="location_on" size="xs" /> {{ biz.neighborhood ? biz.neighborhood.name : 'نامشخص' }}</div>
+                  </div>
+                  <div v-if="biz.rating_count > 0" class="col-auto text-right">
+                    <q-rating v-model="biz.average_rating" :max="5" size="16px" color="orange" icon="star" readonly />
+                    <div class="text-caption text-grey-7 q-ml-xs">({{ biz.rating_count }})</div>
+                  </div>
+                </div>
+              </q-card-section>
+              <q-card-section class="q-pt-none">
+                <div class="text-h6 text-green-8 text-weight-bold">
+                  {{ biz.price_string || 'تماس بگیرید' }}
+                </div>
+              </q-card-section>
+              <q-separator />
+              <q-card-actions class="q-px-md q-py-sm">
+                <q-avatar size="30px">
+                  <img v-if="biz.user.profile?.profile_picture_url" :src="biz.user.profile.profile_picture_url">
+                  <q-icon v-else name="account_circle" />
+                </q-avatar>
+                <span class="q-ml-sm text-grey-8">{{ biz.user.username }}</span>
+                <q-space />
+                <q-btn label="جزئیات" color="primary" flat dense :to="`/business/${biz.id}`" />
+                <q-btn label="رزرو" color="primary" unelevated dense />
+              </q-card-actions>
+            </q-card>
           </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="q-pa-lg flex flex-center" v-if="totalPages > 1">
+          <q-pagination v-model="currentPage" :max="totalPages" @update:model-value="applyFilters" direction-links />
         </div>
       </div>
     </div>
@@ -276,8 +275,8 @@ onMounted(() => {
   font-weight: 500;
 }
 .filter-sidebar {
-  position: sticky;
-  top: 80px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
 }
 .business-card {
   transition: all 0.3s ease;

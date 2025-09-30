@@ -113,22 +113,33 @@
   const $q = useQuasar();
   const authStore = useAuthStore();
 
-  async function fetchComments() {
-    if (!props.postId) return;
-    loadingComments.value = true;
-    commentsError.value = false;
-    try {
-      const response = await api.get('/api/comments/', {
-        params: { post_id: props.postId }
-      });
-      comments.value = response.data;
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-      commentsError.value = true;
-    } finally {
-      loadingComments.value = false;
-    }
+async function fetchComments() {
+  if (!props.postId) return;
+  loadingComments.value = true;
+  commentsError.value = false;
+  try {
+    const params = {
+      post: props.postId // <<<< پارامتر فیلتر
+    };
+
+    // ***** لاگ بسیار مهم برای دیباگ *****
+    console.log(`POST_COMMENTS: Fetching comments for postId: ${props.postId}. Requesting URL: /api/comments/ with params:`, params);
+
+    const response = await api.get('/api/comments/', { params });
+
+    // ... (بقیه کد)
+    comments.value = response.data.results || response.data;
+    console.log(`POST_COMMENTS: Received ${comments.value.length} comments for postId: ${props.postId}`, response.data);
+
+  } catch (error) {
+    console.error("POST_COMMENTS: Error fetching comments:", error);
+    commentsError.value = true;
+  } finally {
+    loadingComments.value = false;
   }
+}
+
+
 
   async function submitComment() {
     if (!newComment.value.trim()) return;

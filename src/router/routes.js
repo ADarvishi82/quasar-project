@@ -51,6 +51,12 @@ const routes = [
         path: 'feed', // یا هر نامی که برای فید می‌خواهید
         name: 'feed',
         component: () => import('pages/FeedPage.vue')
+      },
+      {
+        path: 'tags/:tagName', // <<<< مسیر داینامیک برای فید هشتگ
+        name: 'hashtag-feed',
+        component: () => import('pages/HashtagFeedPage.vue'),
+        props: true // برای پاس دادن tagName به عنوان prop
       }
     ]
   },

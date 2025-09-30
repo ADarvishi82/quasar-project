@@ -127,13 +127,6 @@
         </q-slide-transition>
       </q-card>
 
-      <!-- Create Post Form -->
-      <CreatePostForm
-        v-if="authStore.isAuthenticated"
-        @postCreated="handleNewPost"
-        class="q-mb-xl create-post-section"
-      />
-
       <!-- Content Section -->
       <div class="content-section">
         <!-- Loading State -->
@@ -291,7 +284,7 @@
                 color="blue-1"
                 text-color="blue-8"
                 class="tag-chip"
-                :to="`/tags/${tag}`"
+                @click="goToTagPage(tag)"
               >
                 <q-icon name="tag" size="14px" class="q-mr-xs" />
                 {{ tag }}
@@ -364,7 +357,7 @@
             </q-slide-transition>
           </q-card>
         </div>
-      </div> <!-- <<-- تگ بسته نشده در اینجا اضافه شد -->
+      </div>
     </div>
 
     <!-- Image Gallery Modal -->
@@ -412,7 +405,6 @@ import { api } from 'boot/axios';
 import { useQuasar } from 'quasar';
 import { useAuthStore } from 'stores/auth-store';
 import { useRouter } from 'vue-router';
-import CreatePostForm from 'components/CreatePostForm.vue';
 import PostComments from 'components/PostComments.vue';
 import { format, parseISO } from 'date-fns';
 
@@ -430,7 +422,6 @@ const galleryDialog = ref(false);
 const currentGalleryImages = ref([]);
 const currentGallerySlide = ref(0);
 
-// متغیرهای جدید برای فیلترها
 const filters = ref({
   neighborhood: null,
   post_type: null,
@@ -462,7 +453,6 @@ async function fetchPosts() {
     const params = { ...filters.value };
     Object.keys(params).forEach(key => (params[key] === null || params[key] === '') && delete params[key]);
 
-    console.log("Fetching posts with filters:", params);
     const response = await api.get('/api/posts/', { params });
     let fetchedPosts = response.data.results || response.data;
     posts.value = fetchedPosts.map(p => ({ ...p, is_liking: false, slide: 0, show_comments: false }));
@@ -494,15 +484,25 @@ function toggleComments(post) {
   post.show_comments = !post.show_comments;
 }
 
-function handleNewPost(newPost) {
-  posts.value.unshift({ ...newPost, is_liking: false, slide: 0, show_comments: false });
-}
-
-// سایر توابع بدون تغییر
 function toggleLike(post) {
-  if (!authStore.isAuthenticated) { $q.notify({ type: 'info', message: 'برای پسندیدن پست‌ها باید ابتدا وارد شوید.', actions: [{ label: 'ورود', color: 'white', handler: () => { router.push('/login') } }] }); return; }
+  if (!authStore.isAuthenticated) {
+    $q.notify({
+      type: 'info',
+      message: 'برای پسندیدن پست‌ها باید ابتدا وارد شوید.',
+      actions: [{ label: 'ورود', color: 'white', handler: () => { router.push('/login') } }]
+    });
+    return;
+  }
   post.is_liking = true;
-  api.post(`/api/posts/${post.id}/like/`).then(() => { post.is_liked_by_user = !post.is_liked_by_user; post.is_liked_by_user ? post.likes_count++ : post.likes_count--; }).catch(error => { console.error("Error toggling like:", error); $q.notify({ type: 'negative', message: 'خطا در عملیات پسندیدن.' }); }).finally(() => { post.is_liking = false; });
+  api.post(`/api/posts/${post.id}/like/`).then(() => {
+    post.is_liked_by_user = !post.is_liked_by_user;
+    post.likes_count += post.is_liked_by_user ? 1 : -1;
+  }).catch(error => {
+    console.error("Error toggling like:", error);
+    $q.notify({ type: 'negative', message: 'خطا در عملیات پسندیدن.' });
+  }).finally(() => {
+    post.is_liking = false;
+  });
 }
 
 function formatDateTime(dateTimeString) {
@@ -526,27 +526,50 @@ function getAuthorAvatar(author) {
 }
 
 function editPost(post) {
-  $q.dialog({ title: 'ویرایش پست', message: 'محتوای جدید را وارد کنید:', prompt: { model: post.content, type: 'textarea' }, cancel: true, persistent: true })
-    .onOk(async (data) => {
-      if (!data || !data.trim()) { $q.notify({ type: 'warning', message: 'محتوا نمی‌تواند خالی باشد.' }); return; }
-      try {
-        const response = await api.patch(`/api/posts/${post.id}/`, { content: data });
-        const index = posts.value.findIndex(p => p.id === post.id);
-        if (index !== -1) { posts.value[index] = { ...posts.value[index], ...response.data }; }
-        $q.notify({ type: 'positive', message: 'پست با موفقیت ویرایش شد.' });
-      } catch (error) { console.error("Error editing post:", error); $q.notify({ type: 'negative', message: 'خطا در ویرایش پست.' }); }
-    });
+  $q.dialog({
+    title: 'ویرایش پست',
+    message: 'محتوای جدید را وارد کنید:',
+    prompt: { model: post.content, type: 'textarea' },
+    cancel: true,
+    persistent: true
+  }).onOk(async (data) => {
+    if (!data || !data.trim()) {
+      $q.notify({ type: 'warning', message: 'محتوا نمی‌تواند خالی باشد.' });
+      return;
+    }
+    try {
+      const response = await api.patch(`/api/posts/${post.id}/`, { content: data });
+      const index = posts.value.findIndex(p => p.id === post.id);
+      if (index !== -1) { posts.value[index] = { ...posts.value[index], ...response.data }; }
+      $q.notify({ type: 'positive', message: 'پست با موفقیت ویرایش شد.' });
+    } catch (error) {
+      console.error("Error editing post:", error);
+      $q.notify({ type: 'negative', message: 'خطا در ویرایش پست.' });
+    }
+  });
 }
 
 function confirmDeletePost(postId) {
-  $q.dialog({ title: 'تأیید حذف', message: 'آیا از حذف این پست مطمئن هستید؟', cancel: { label: 'لغو', color: 'grey' }, ok: { label: 'حذف کن', color: 'negative' }, persistent: true })
-    .onOk(async () => {
-      try {
-        await api.delete(`/api/posts/${postId}/`);
-        posts.value = posts.value.filter(p => p.id !== postId);
-        $q.notify({ type: 'positive', message: 'پست با موفقیت حذف شد.' });
-      } catch (error) { console.error("Error deleting post:", error); $q.notify({ type: 'negative', message: 'خطا در حذف پست.' }); }
-    });
+  $q.dialog({
+    title: 'تأیید حذف',
+    message: 'آیا از حذف این پست مطمئن هستید؟',
+    cancel: { label: 'لغو', color: 'grey' },
+    ok: { label: 'حذف کن', color: 'negative' },
+    persistent: true
+  }).onOk(async () => {
+    try {
+      await api.delete(`/api/posts/${postId}/`);
+      posts.value = posts.value.filter(p => p.id !== postId);
+      $q.notify({ type: 'positive', message: 'پست با موفقیت حذف شد.' });
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      $q.notify({ type: 'negative', message: 'خطا در حذف پست.' });
+    }
+  });
+}
+function goToTagPage(tagName) {
+  const encodedTagName = encodeURIComponent(tagName);
+  router.push(`/tags/${encodedTagName}`);
 }
 
 onMounted(() => {
@@ -556,13 +579,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* تمام استایل‌های قبلی شما بدون تغییر اینجا قرار می‌گیرند */
 .feed-page {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
 }
 
 .page-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0e9458 0%, #16d708 100%);
   color: white;
   position: relative;
   overflow: hidden;
@@ -610,7 +634,7 @@ onMounted(() => {
 }
 
 .filter-icon {
-  color: #667eea;
+  color: #0cb520;
   font-size: 1.2rem;
   margin-left: 8px;
 }
@@ -704,7 +728,7 @@ onMounted(() => {
 }
 
 .author-avatar:hover {
-  border-color: #667eea;
+  border-color: #1fad09af;
 }
 
 .author-info {

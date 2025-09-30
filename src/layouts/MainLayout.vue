@@ -1,16 +1,16 @@
 <template>
-  <q-layout view="lHh LpR lfr">
+  <q-layout view="lHh LpR lfr" class="rtl-layout">
 
     <!-- Header -->
     <q-header elevated class="custom-header shadow-2">
       <q-toolbar class="q-px-lg q-py-sm">
         <div class="row items-center full-width">
           <!-- Logo Section -->
-          <div class="row items-center q-mr-lg">
+          <div class="row items-center q-ml-lg">
             <q-avatar size="42px" class="logo-avatar">
-              <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
+              <img src="src\assets\Between Friends Logo.jpg">
             </q-avatar>
-            <div class="q-ml-sm">
+            <div class="q-mr-sm">
               <div class="logo-text">همسایه</div>
               <div class="logo-subtitle">شبکه همسایگی</div>
             </div>
@@ -54,7 +54,7 @@
           <q-separator vertical spaced class="gt-sm separator-custom" />
 
           <!-- User Section -->
-          <div v-if="authStore.isAuthenticated" class="q-ml-md">
+          <div v-if="authStore.isAuthenticated" class="q-mr-md">
             <q-btn-dropdown flat round class="user-dropdown" dropdown-icon="none">
               <template v-slot:label>
                 <div class="row items-center q-gutter-xs">
@@ -68,7 +68,7 @@
               <q-list dense class="user-menu">
                 <q-item-label header class="text-primary text-weight-bold q-pa-md">
                   <div class="row items-center">
-                    <q-avatar size="40px" class="q-mr-sm">
+                    <q-avatar size="40px" class="q-ml-sm">
                       <img v-if="userAvatarUrl" :src="userAvatarUrl" alt="Avatar">
                       <q-icon v-else name="account_circle" />
                     </q-avatar>
@@ -101,7 +101,7 @@
               </q-list>
             </q-btn-dropdown>
           </div>
-          <div v-else class="row q-gutter-x-sm q-ml-md">
+          <div v-else class="row q-gutter-x-sm q-mr-md">
             <q-btn label="ورود" color="white" text-color="primary" unelevated rounded @click="showLoginModal = true"
               class="login-btn" size="sm" />
             <q-btn label="ثبت نام" color="white" text-color="primary" unelevated rounded
@@ -115,8 +115,9 @@
     <q-page-container class="page-background">
       <q-page class="q-pa-md">
         <div class="row q-col-gutter-lg justify-center">
-          <!-- Right Sidebar -->
-          <div class="col-12 col-lg-3 col-md-4 gt-sm order-first order-lg-last">
+
+          <!-- Right Sidebar (Main) -->
+          <div class="col-12 col-lg-3 col-md-4 gt-sm">
             <div class="q-gutter-y-md sticky-sidebar">
               <q-card class="sidebar-card user-card" v-if="authStore.isAuthenticated">
                 <div class="user-card-header">
@@ -152,21 +153,15 @@
                 </q-card-section>
               </q-card>
 
-              <!-- ================ بخش اضافه شده ================ -->
-              <!-- باکس آمار محله (با کامپوننت جدید) -->
               <NeighborhoodStats v-if="authStore.isAuthenticated" />
-
-              <!-- باکس موضوعات محبوب (با کامپوننت جدید) -->
               <PopularTags />
-              <!-- ============================================= -->
 
-              <!-- Quick Actions Card -->
               <q-card class="sidebar-card">
                 <q-card-section>
                   <div class="text-subtitle2 text-weight-bold q-mb-md text-primary">دسترسی سریع</div>
                   <div class="q-gutter-y-xs">
                     <q-btn flat class="full-width justify-start text-left" icon="add_circle" label="پست جدید"
-                      color="primary" />
+                      color="primary" @click="showCreatePostModal = true"/>
                     <q-btn flat class="full-width justify-start text-left" icon="business" label="کسب‌وکار جدید"
                       color="primary" />
                     <q-btn flat class="full-width justify-start text-left" icon="location_on" label="محله من"
@@ -179,60 +174,14 @@
 
           <!-- Main Content -->
           <div class="col-12 col-lg-6 col-md-8">
-            <router-view />
+            <router-view :key="$route.fullPath" />
           </div>
 
-          <!-- Left Sidebar -->
+          <!-- Left Sidebar (Secondary) -->
           <div class="col-12 col-lg-3 col-md-4 gt-sm">
             <div class="q-gutter-y-md sticky-sidebar">
               <ImportantNews v-if="authStore.isAuthenticated" />
               <UpcomingEvents v-if="authStore.isAuthenticated" />
-
-              <!-- Trending Card -->
-              <q-card class="sidebar-card">
-                <q-card-section>
-                  <div class="text-subtitle2 text-weight-bold q-mb-md text-primary">
-                    <q-icon name="trending_up" class="q-mr-xs" />
-                    موضوعات داغ محله
-                  </div>
-                  <div class="q-gutter-y-sm">
-                    <div class="trending-item">
-                      <div class="text-body2">#تعمیرات_خیابان_آزادی</div>
-                      <div class="text-caption text-grey-6">۱۲ پست</div>
-                    </div>
-                    <div class="trending-item">
-                      <div class="text-body2">#بازار_محلی</div>
-                      <div class="text-caption text-grey-6">۸ پست</div>
-                    </div>
-                    <div class="trending-item">
-                      <div class="text-body2">#ایمنی_محله</div>
-                      <div class="text-caption text-grey-6">۵ پست</div>
-                    </div>
-                  </div>
-                </q-card-section>
-              </q-card>
-
-              <!-- Suggestions Card -->
-              <q-card class="sidebar-card">
-                <q-card-section>
-                  <div class="text-subtitle2 text-weight-bold q-mb-md text-primary">
-                    <q-icon name="recommend" class="q-mr-xs" />
-                    پیشنهادات
-                  </div>
-                  <div class="q-gutter-y-sm">
-                    <div class="suggestion-item">
-                      <q-avatar size="32px" class="q-mr-sm">
-                        <img src="https://via.placeholder.com/32" alt="Business">
-                      </q-avatar>
-                      <div class="flex-1">
-                        <div class="text-body2">کافه نیلوفر</div>
-                        <div class="text-caption text-grey-6">کسب‌وکار محلی</div>
-                      </div>
-                      <q-btn flat size="sm" color="primary" label="دنبال" />
-                    </div>
-                  </div>
-                </q-card-section>
-              </q-card>
             </div>
           </div>
         </div>
@@ -240,17 +189,35 @@
     </q-page-container>
 
     <!-- Floating Action Button -->
-    <q-page-sticky position="bottom-right" :offset="[18, 18]" v-if="authStore.isAuthenticated">
-      <q-btn fab icon="add" color="primary" size="lg" class="floating-btn">
+    <q-page-sticky position="bottom-left" :offset="[18, 18]" v-if="authStore.isAuthenticated">
+      <q-btn fab icon="add" color="primary" size="lg" class="floating-btn" @click="showCreatePostModal = true">
         <q-tooltip class="bg-grey-8 text-white" anchor="top middle" self="bottom middle">
           پست جدید
         </q-tooltip>
       </q-btn>
     </q-page-sticky>
 
+    <!-- Chatbot Widget -->
+    <q-page-sticky position="bottom-right" :offset="[18, 80]">
+      <ChatbotWidget v-if="isChatOpen" class="chatbot-widget" />
+    </q-page-sticky>
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn
+        fab
+        :icon="isChatOpen ? 'close' : 'support_agent'"
+        color="accent"
+        @click="isChatOpen = !isChatOpen"
+      />
+    </q-page-sticky>
+
     <!-- Modals -->
     <LoginModal v-model="showLoginModal" @switchToRegister="openRegisterModal" @loginSuccess="onLoginSuccess" />
     <RegisterModal v-model="showRegisterModal" @switchToLogin="openLoginModal" />
+
+    <q-dialog v-model="showCreatePostModal">
+      <CreatePostForm @postCreated="handlePostCreation" />
+    </q-dialog>
+
   </q-layout>
 </template>
 
@@ -262,37 +229,24 @@ import LoginModal from 'components/LoginModal.vue';
 import RegisterModal from 'components/RegisterModal.vue';
 import ImportantNews from 'components/sidebars/ImportantNews.vue';
 import UpcomingEvents from 'components/sidebars/UpcomingEvents.vue';
-// =================== ایمپورت‌های اضافه شده ===================
 import NeighborhoodStats from 'components/sidebars/NeighborhoodStats.vue';
 import PopularTags from 'components/sidebars/PopularTags.vue';
-// ==========================================================
+import ChatbotWidget from 'components/ChatbotWidget.vue';
+import CreatePostForm from 'components/CreatePostForm.vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
 const search = ref('');
 const showLoginModal = ref(false);
 const showRegisterModal = ref(false);
+const isChatOpen = ref(false);
+const showCreatePostModal = ref(false);
 
 const userAvatarUrl = computed(() => {
   const user = authStore.user;
-  console.log("MainLayout Avatar Computed: Checking user data in store:", user);
-
-  if (!user) {
-    console.log("MainLayout Avatar Computed: No user found.");
-    return null;
-  }
-
-  if (user.profile && user.profile.profile_picture_url) {
-    console.log("MainLayout Avatar Computed: Found user profile picture:", user.profile.profile_picture_url);
-    return user.profile.profile_picture_url;
-  }
-
-  if (user.business_profile && user.business_profile.logo_url) {
-    console.log("MainLayout Avatar Computed: Found business logo:", user.business_profile.logo_url);
-    return user.business_profile.logo_url;
-  }
-
-  console.log("MainLayout Avatar Computed: No avatar found for user.");
+  if (!user) return null;
+  if (user.profile && user.profile.profile_picture_url) return user.profile.profile_picture_url;
+  if (user.business_profile && user.business_profile.logo_url) return user.business_profile.logo_url;
   return null;
 });
 
@@ -314,12 +268,25 @@ async function handleLogout() {
   await authStore.logout();
   router.push('/');
 }
+
+function handlePostCreation() {
+  showCreatePostModal.value = false;
+  if (router.currentRoute.value.path === '/feed') {
+    router.go(0);
+  } else {
+    router.push('/feed');
+  }
+}
 </script>
 
 <style scoped>
+.rtl-layout {
+  direction: rtl;
+}
+
 /* Header Styles */
 .custom-header {
-  background: linear-gradient(135deg, #41e324 0%, #5ba24b 100%);
+  background: linear-gradient(135deg, #27f204 0%, #146701 100%);
   backdrop-filter: blur(10px);
 }
 
@@ -501,6 +468,12 @@ async function handleLogout() {
 .floating-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 12px 35px rgba(56, 224, 115, 0.5);
+}
+
+/* Chatbot Widget Style */
+.chatbot-widget {
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 /* Responsive Design */

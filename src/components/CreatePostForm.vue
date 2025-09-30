@@ -467,7 +467,7 @@ async function submitPost() {
 }
 
 .create-post-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #04b01e 0%, #054104 100%);
   color: white;
   padding: 1.5rem;
   position: relative;
@@ -582,7 +582,7 @@ async function submitPost() {
 }
 
 .file-count-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #07a219 0%, #069a0b 100%);
   color: white;
   border-radius: 20px;
   padding: 6px 12px;
@@ -690,7 +690,7 @@ async function submitPost() {
 
 .tags-input:focus-within {
   background: white;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 0 0 2px rgba(7, 170, 88, 0.2);
 }
 
 .tags-hint {
@@ -720,7 +720,7 @@ async function submitPost() {
 
 .visibility-select:focus-within {
   background: white;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 0 0 2px rgba(11, 167, 2, 0.2);
 }
 
 .visibility-item {
@@ -740,7 +740,7 @@ async function submitPost() {
 }
 
 .input-icon {
-  color: #667eea;
+  color: #05aa0d;
   opacity: 0.8;
 }
 
@@ -778,20 +778,20 @@ async function submitPost() {
 
 .draft-btn:hover {
   background: rgba(113, 128, 150, 0.1);
-  color: #4a5568;
+  color: #16ad05;
 }
 
 .submit-btn {
   border-radius: 12px;
   font-weight: 600;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #069910 0%, #14c304 100%);
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
   transition: all 0.2s ease;
   padding: 12px 24px;
 }
 
 .submit-btn:hover {
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(9, 194, 12, 0.4);
   transform: translateY(-1px);
 }
 
